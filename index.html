@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<meta charset="UTF-8">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>Closing Bartender</title>
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+margin:0;
+padding:0;
+}
+
+
+body{
+
+background:
+#f3f4f6;
+
+padding:
+20px;
+
+}
+
+
+.card{
+
+max-width:
+1000px;
+
+margin:
+auto;
+
+background:
+white;
+
+padding:
+25px;
+
+border-radius:
+20px;
+
+box-shadow:
+0 10px 30px rgba(
+0,0,0,.08
+);
+
+}
+
+
+h2{
+
+text-align:
+center;
+
+margin-bottom:
+25px;
+
+}
+
+
+
+.top{
+
+display:
+grid;
+
+grid-template-columns:
+1fr 1fr 1fr;
+
+gap:
+15px;
+
+margin-bottom:
+25px;
+
+}
+
+
+
+@media(
+max-width:700px
+){
+
+.top{
+
+grid-template-columns:
+1fr;
+
+}
+
+}
+
+
+
+.top div{
+
+display:
+flex;
+
+flex-direction:
+column;
+
+}
+
+
+
+label{
+
+font-size:
+14px;
+
+font-weight:
+600;
+
+margin-bottom:
+6px;
+
+}
+
+
+
+input,
+select{
+
+padding:
+12px;
+
+border:
+1px solid #ddd;
+
+border-radius:
+10px;
+
+width:
+100%;
+
+}
+
+
+
+table{
+
+width:
+100%;
+
+border-collapse:
+collapse;
+
+}
+
+
+
+th{
+
+background:
+#222;
+
+color:
+white;
+
+padding:
+14px;
+
+}
+
+
+
+td{
+
+padding:
+10px;
+
+border-bottom:
+1px solid #eee;
+
+text-align:
+center;
+
+}
+
+
+
+.qty{
+
+width:
+80px;
+
+text-align:
+center;
+
+}
+
+
+
+button{
+
+width:
+100%;
+
+padding:
+15px;
+
+border:
+none;
+
+background:
+#16a34a;
+
+color:
+white;
+
+font-size:
+16px;
+
+font-weight:
+600;
+
+border-radius:
+12px;
+
+cursor:
+pointer;
+
+margin-top:
+20px;
+
+}
+
+
+
+button:hover{
+
+background:
+#15803d;
+
+}
+
+
+
+.loading{
+
+opacity:
+.6;
+
+pointer-events:
+none;
+
+}
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="card">
+
+
+<h2>
+
+🍹 Closing Bartender
+
+</h2>
+
+
+
+<div class="top">
+
+
+<div>
+
+<label>
+
+Tanggal
+
+</label>
+
+
+<input
+type="date"
+id="tanggal">
+
+</div>
+
+
+
+
+<div>
+
+<label>
+
+Shift
+
+</label>
+
+
+<select
+id="shift">
+
+<option value="">
+Pilih Shift
+</option>
+
+<option>
+Shift 1
+</option>
+
+<option>
+Shift 2
+</option>
+
+</select>
+
+
+</div>
+
+
+
+
+
+<div>
+
+<label>
+
+Nama Petugas
+
+</label>
+
+
+<input
+id="petugas"
+
+placeholder=
+"Masukkan nama">
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+
+Barang
+
+</th>
+
+
+<th>
+
+Jumlah Keluar
+
+</th>
+
+
+</tr>
+
+</thead>
+
+
+
+<tbody
+id="listBarang">
+
+</tbody>
+
+
+</table>
+
+
+
+
+
+<button
+id="btnSimpan"
+onclick="simpan()">
+
+💾 Simpan Closing
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+const SCRIPT_URL=
+
+"https://script.google.com/macros/s/AKfycbwP0bSRP2vK3GZ2nvxgMwiNiJKVnyVHup1nvNKopP6BiGV-33oKWuTklhY9y_0BXSFR/exec";
+
+
+
+const barang=[
+
+"ALPUKAT FROZ",
+"MANGGA GOLEK/GADUNG",
+"JERUK PERAS",
+"MELON FROZ",
+"WHIP CREAM",
+"NANGKA FROZ",
+"STRAWBERRY FROZ",
+"SIRSAK FROZ",
+"BUAH NAGA",
+"BUAH SEMANGKA",
+"SIRUP LYCHE",
+"SIRUP MANGGA",
+"SIRUP MELON",
+"BUAH LECI",
+"LYCHEETEA",
+"RED VELVET",
+"MATCHA",
+"CHOCOLATE",
+"COOKIES&CREAM",
+"LEMONTEA",
+"VANILLA",
+"THAITEA",
+"TARO",
+"BUBBLEGUM",
+"SKM",
+"UHT",
+"GLAZE COKLAT",
+"ZODA",
+"NATADECOCO",
+"GELAS 16OZ",
+"GELAS PAHE 11OZ",
+"SEAL MINUMAN",
+"KERTAS NASI COKLAT",
+"KERTAS NASI PUTIH",
+"KERTAS PRINT BESAR",
+"KERTAS PRINT KECIL",
+"SENDOK TAKE-AWAY",
+"SENDOK JASUKE",
+"THINWALL 500ML",
+"THINWALL 300ML",
+"THINWALL 650ML",
+"WADAH JASUKE 200ML",
+"KOTAK (L)",
+"KOTAK (M)",
+"SEDOTAN STD",
+"SEDOTAN BOBA",
+"WADAH SAMBAL 35ML",
+"PLASTIK ES BATU",
+"KRESEK S15",
+"KRESEK S21",
+"KRESEK S24",
+"KRESEK GELAS",
+"CETIK 8x12",
+"CETIK 7x12",
+"SUNLIGHT JERIGEN",
+"BERAS"
+
+];
+
+
+
+let html="";
+
+
+barang.forEach((b,i)=>{
+
+
+html+=`
+
+<tr>
+
+<td>
+
+${b}
+
+</td>
+
+
+<td>
+
+<input
+
+type="number"
+
+value="0"
+
+min="0"
+
+id="qty${i}"
+
+class="qty"
+
+>
+
+</td>
+
+</tr>
+
+`;
+
+
+});
+
+
+
+listBarang.innerHTML=
+html;
+
+
+
+
+
+async function simpan(){
+
+
+
+let tanggal=
+document
+.getElementById(
+"tanggal"
+).value;
+
+
+
+let shift=
+document
+.getElementById(
+"shift"
+).value;
+
+
+
+let petugas=
+document
+.getElementById(
+"petugas"
+).value;
+
+
+
+if(
+!tanggal
+){
+
+alert(
+"Isi tanggal"
+);
+
+return;
+
+}
+
+
+
+if(
+!shift
+){
+
+alert(
+"Pilih shift"
+);
+
+return;
+
+}
+
+
+
+if(
+!petugas
+){
+
+alert(
+"Isi nama"
+);
+
+return;
+
+}
+
+
+
+let hasil=[];
+
+
+
+for(
+
+let i=0;
+
+i<barang.length;
+
+i++
+
+){
+
+
+let qty=
+
+document
+.getElementById(
+
+`qty${i}`
+
+).value;
+
+
+
+if(
+
+qty===""
+
+){
+
+alert(
+
+`Isi ${barang[i]}`
+
+);
+
+return;
+
+}
+
+
+
+hasil.push({
+
+barang:
+barang[i],
+
+qty:
+qty
+
+});
+
+
+}
+
+
+
+
+
+let data={
+
+tanggal,
+
+shift,
+
+petugas,
+
+barang:
+hasil
+
+};
+
+
+
+let btn=
+document.getElementById(
+"btnSimpan"
+);
+
+
+btn.innerHTML=
+"⏳ Menyimpan...";
+
+
+btn.disabled=
+true;
+
+
+
+try{
+
+
+await fetch(
+
+SCRIPT_URL,
+
+{
+
+method:
+"POST",
+
+mode:
+"no-cors",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+body:
+JSON.stringify(
+data
+)
+
+}
+
+);
+
+
+
+
+alert(
+
+"✅ Closing berhasil disimpan"
+
+);
+
+
+
+
+location.reload();
+
+
+
+}catch(e){
+
+alert(
+
+"Gagal simpan"
+
+);
+
+
+
+
+btn.innerHTML=
+
+"💾 Simpan Closing";
+
+
+btn.disabled=
+false;
+
+}
+
+
+
+}
+
+
+
+</script>
+
+</body>
+</html>
